@@ -1,7 +1,12 @@
 import logo from "./logo.svg";
 import "./App.css";
 import { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
 import { auth } from "./firebaseConfig";
 
 function App() {
@@ -9,6 +14,7 @@ function App() {
   const [registerPassword, setRegisterPassword] = useState("");
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState();
+  const [user, setUser] = useState("");
 
   const registerUser = async () => {
     try {
@@ -23,9 +29,26 @@ function App() {
     }
   };
 
-  const loginUser = () => {};
+  onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+  });
 
-  const logoutUser = () => {};
+  const loginUser = async () => {
+    try {
+      const user = await signInWithEmailAndPassword(
+        auth,
+        loginEmail,
+        loginPassword
+      );
+      console.log(user);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const logoutUser = async () => {
+    await signOut(auth);
+  };
 
   return (
     <div className="App">
@@ -58,7 +81,9 @@ function App() {
       />{" "}
       <br />
       <br />
-      <button>Login</button>
+      <button onClick={loginUser}>Login</button>
+      <h2>{auth?.currentUser?.email}</h2>
+      <button onClick={logoutUser}>Logout</button>
     </div>
   );
 }
