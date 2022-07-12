@@ -6,8 +6,9 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
+  signInWithPopup,
 } from "firebase/auth";
-import { auth } from "./firebaseConfig";
+import { auth, provider } from "./firebaseConfig";
 
 function App() {
   const [registerEmail, setRegisterEmail] = useState("");
@@ -50,6 +51,15 @@ function App() {
     await signOut(auth);
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const user = await signInWithPopup(auth, provider);
+      console.log(user.user.displayName);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="App">
       <h1>Register User</h1>
@@ -84,6 +94,8 @@ function App() {
       <button onClick={loginUser}>Login</button>
       <h2>{auth?.currentUser?.email}</h2>
       <button onClick={logoutUser}>Logout</button>
+      <br />
+      <button onClick={signInWithGoogle}>Google Auth</button>
     </div>
   );
 }
